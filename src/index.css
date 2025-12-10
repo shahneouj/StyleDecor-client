@@ -1,2 +1,28 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes:
+    emerald --default,
+    forest --prefersdark;
+}
+/*dasiui custorm*/
+@utility navbar {
+  @apply mx-auto max-w-[1200px];
+}
+/*Global styles*/
+section,
+footer {
+  @apply mx-auto max-w-[1200px];
+}
+
+/* Custom styles */
+.logo {
+  @apply flex items-center gap-2;
+}
+
+.logo h2 {
+  @apply text-2xl font-bold;
+}
+
+.logo svg {
+  @apply text-4xl;
+}
