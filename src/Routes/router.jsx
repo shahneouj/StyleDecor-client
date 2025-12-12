@@ -4,15 +4,21 @@ import App from "../Layout/App/App.jsx";
 import Home from "../Pages/Home/Home.jsx";
 import About from "../Pages/About/About.jsx";
 import Contact from "../Pages/Contact/Contact.jsx";
-
+import Service from "../Pages/Service/Service.jsx";
+import ErrorPage from "../Pages/ErrorPage/ErrorPage.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
+    ErrorBoundary: ErrorPage,
     element: <App />,
     children: [
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/service",
+        element: <Service />,
       },
       {
         path: "/about",
