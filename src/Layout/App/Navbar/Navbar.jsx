@@ -3,7 +3,12 @@ import Logo from "../../../component/Logo/Logo.jsx";
 import { useState } from "react";
 import { useEffect } from "react";
 import { NavLink } from "react-router";
+import useAuth from "../../../Hook/useAuth.js";
+
 const NavBar = () => {
+  const { user } = useAuth();
+  console.log(user);
+
   const navManu = (
     <>
       <li>
@@ -28,12 +33,12 @@ const NavBar = () => {
     <>
       <li>
         {" "}
-        <NavLink to="/login">Login</NavLink>
+        <NavLink className="btn btn-primary" to="/login">Login</NavLink>
       </li>
       <li>
         {" "}
-        <NavLink to="/register">Register</NavLink>
-      </li>
+        <NavLink className=" btn btn-primary" to="/register">Register</NavLink>
+      </li >
     </>
   );
 
@@ -64,6 +69,10 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               {navManu}
+              {/* {
+                !user ? authNav : ''
+              } */}
+
             </ul>
           </div>
           <Logo />
@@ -71,9 +80,10 @@ const NavBar = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{navManu}</ul>
         </div>
-        <div className="navbar-end">
-          <a className="btn btn-primary">Button</a>
+        <div className="navbar-end menu menu-horizontal gap-3">
+          {authNav}
           <Toggletheme />
+
         </div>
       </div>
     </nav>

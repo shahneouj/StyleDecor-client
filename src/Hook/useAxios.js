@@ -1,20 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-/**
- * @param {string} method - HTTP method
- * @param {string} url - API endpoint URL
- * @param {object} config - Axios config for GET (optional)
- * @param {object} options - React Query options
- * @param {() => Promise<string>} getToken - async function to get Firebase ID token (optional)
- */
 export const useAxios = (method, url, config = {}, options = {}, getToken) => {
+  const { user } = useAuth()
   const queryClient = useQueryClient();
   const httpMethod = method.toLowerCase();
 
   const authHeaders = async () => {
     if (!getToken) return {};
-    const token = await getToken();
+    const token = await user.accessToken;
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
