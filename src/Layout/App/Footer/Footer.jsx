@@ -1,10 +1,9 @@
-import React from "react";
-import { BsDistributeVertical } from "react-icons/bs";
-
+// src/components/Footer.jsx
 const Footer = () => {
   return (
-    <div className="bg-neutral text-neutral-content">
-      <footer className="footer sm:footer-horizontal  p-10">
+    <div className="bg-base-200">
+
+      <footer className=" footer  text-base-content mt-16">
         <div className="container mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-12">
 
           {/* Contact Details */}
@@ -46,10 +45,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="bg-base-300 py-4 text-center text-sm">
-          © {new Date().getFullYear()} Your Business Name — All Rights Reserved.
-        </div>
+
       </footer>
+      <div className="bg-base-300 py-4 text-center text-sm">
+        © {new Date().getFullYear()} Your Business Name — All Rights Reserved.
+      </div>
     </div>
   );
 };
