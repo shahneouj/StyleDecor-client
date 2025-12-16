@@ -1,50 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ServiceCard from "../../component/ServiceCard/ServiceCard";
+import useAxios from "../../Hook/useAxios";
 const Home = () => {
-  const services = [
-    {
-      id: 1,
-      name: "Wedding Stage Premium",
-      description:
-        "A luxurious floral wedding stage with LED backdrops and elegant drapery.",
-      image: "https://images.unsplash.com/photo-1605270492741-27b3ac7223de",
-    },
-    {
-      id: 2,
-      name: "Home Birthday Decoration",
-      description:
-        "Balloon arch, light backdrop, and themed interior decorations for birthdays.",
-      image: "https://images.unsplash.com/photo-1604014237800-1c803b8363d0",
-    },
-    {
-      id: 3,
-      name: "Ceremony Flower Package",
-      description: "Fresh flower arrangements for events and home ceremonies.",
-      image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde",
-    },
-    {
-      id: 4,
-      name: "Home Interior Setup",
-      description:
-        "Modern minimal interior styling with elegant lighting and decor elements.",
-      image: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5",
-    },
-    {
-      id: 5,
-      name: "Engagement Decor Deluxe",
-      description:
-        "Stage, floral designs, table decor, and a premium photo booth wall.",
-      image: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77",
-    },
-    {
-      id: 6,
-      name: "Corporate Event Decoration",
-      description:
-        "Professional and clean event setup for conferences and business ceremonies.",
-      image: "https://images.unsplash.com/photo-1503428593586-e225b39bddfe",
-    },
-  ];
+  const { data, isLoading } = useAxios("get", "/decoration-services");
+  const services = data?.data || [];
   return (
     <div>
       <motion.section
@@ -69,7 +29,7 @@ const Home = () => {
       <section className="px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold mb-6">Decoration Packages</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {services.map((service, index) => (
+          {services.slice(0, 6).map((service, index) => (
             <ServiceCard key={index} service={service}></ServiceCard>
           ))}
         </div>

@@ -1,3 +1,7 @@
+import { Link } from "react-router";
+
+
+
 export default function ServiceCard({ service }) {
   return (
     <div className="card bg-base-100 shadow-md hover:shadow-xl transition">
@@ -29,9 +33,9 @@ export default function ServiceCard({ service }) {
         </div>
 
         <div className="card-actions mt-4">
-          <button className="btn btn-primary w-full">
-            Book Now
-          </button>
+          <Link to={`/services/${service._id}`} className="btn btn-primary w-full">
+            View More
+          </Link>
         </div>
       </div>
     </div>

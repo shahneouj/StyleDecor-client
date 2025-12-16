@@ -8,6 +8,7 @@ import Service from "../Pages/Service/Service.jsx";
 import ErrorPage from "../Pages/ErrorPage/ErrorPage.jsx";
 import LoginPage from "../Pages/Login/Login.jsx";
 import RegisterPage from "../Pages/Register/Register.jsx";
+import ServiceDetails from "../Pages/ServiceDetails/ServiceDetails.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterPage />
+      },
+      {
+        path: "/services/:id",
+        element: <ServiceDetails />
       }
     ],
   },
