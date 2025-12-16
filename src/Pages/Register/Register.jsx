@@ -1,10 +1,12 @@
 // RegisterPage.jsx
 import React from 'react';
-
+import useAuth from '../../Hook/useAuth.js'
 const RegisterPage = () => {
+  const { createUser } = useAuth();
   const handleSubmit = (e) => {
     e.preventDefault();
     // Your registration logic goes here
+    // createUser()
     console.log("Register form submitted");
   };
 

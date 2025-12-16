@@ -1,52 +1,63 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import useAuth from "./useAuth";
 
-export const useAxios = (method, url, config = {}, options = {}, getToken) => {
-  const { user } = useAuth()
+// Axios instance with base URL
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8000",
+  withCredentials: true, // optional (cookies / CORS)
+});
+
+const useAxios = (method, url, config = {}, options = {}) => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const httpMethod = method.toLowerCase();
 
-  const authHeaders = async () => {
-    if (!getToken) return {};
-    const token = await user.accessToken;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+  const getAuthHeaders = async () => {
+    if (!user) return {};
+    const token = await user.getIdToken(); // Firebase JWT
+    return { Authorization: `Bearer ${token}` };
   };
 
+  // ---------- GET ----------
   if (httpMethod === "get") {
-    const fetchData = async () => {
-      const headers = await authHeaders();
-      const response = await axios.get(url, {
-        ...config,
-        headers: {
-          ...(config.headers || {}),
-          ...headers,
-        },
-      });
-      return response.data;
-    };
-    return useQuery([url, config], fetchData, options);
-  } else {
-    const mutateFn = async (data) => {
-      const headers = await authHeaders();
-      const response = await axios({
+    return useQuery({
+      queryKey: [url, config],
+      queryFn: async () => {
+        const headers = await getAuthHeaders();
+        const res = await axiosInstance.get(url, {
+          ...config,
+          headers: {
+            ...(config.headers || {}),
+            ...headers,
+          },
+        });
+        return res.data;
+      },
+      ...options,
+    });
+  }
+
+  // ---------- POST / PUT / DELETE ----------
+  return useMutation({
+    mutationFn: async (data) => {
+      const headers = await getAuthHeaders();
+      const res = await axiosInstance({
         method: httpMethod,
         url,
         data,
         headers,
       });
-      return response.data;
-    };
-
-    return useMutation(mutateFn, {
-      ...options,
-      onSuccess: (...args) => {
-        if (options.invalidateQueries) {
-          queryClient.invalidateQueries(options.invalidateQueries);
-        }
-        if (options.onSuccess) {
-          options.onSuccess(...args);
-        }
-      },
-    });
-  }
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      if (options.invalidateQueries) {
+        queryClient.invalidateQueries({ queryKey: options.invalidateQueries });
+      }
+      options.onSuccess?.(...args);
+    },
+    ...options,
+  });
 };
+
+export default useAxios;
