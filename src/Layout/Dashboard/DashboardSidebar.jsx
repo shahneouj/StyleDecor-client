@@ -1,72 +1,86 @@
 import React from 'react';
 import { NavLink } from 'react-router';
 import useAuth from '../../Hook/useAuth.js';
+import useAxios from '../../Hook/useAxios.js';
+
+const SidebarLink = ({ to, children, badge }) => (
+  <li>
+    <NavLink to={to} className="justify-between">
+      {children}
+      {badge ? <div className="badge">{badge}</div> : null}
+    </NavLink>
+  </li>
+);
 
 const DashboardSidebar = () => {
-  const { user } = useAuth() || {}; // derive a demo role from email if real role not present
-  const userRole = user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
+  const { user } = useAuth() || {};
+  const { data: userRecord } = useAxios('get', user?.email ? `/users/${encodeURIComponent(user.email)}` : '/users/none', {}, { enabled: !!user?.email });
+  const dbUser = userRecord?.data;
+  const userRole = dbUser?.role || user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
+  const avatarUrl = dbUser?.photoURL || user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`;
 
   return (
-    <div className="w-64 bg-base-200 h-full p-4">
-      <div className="mb-6">
-        <h3 className="text-xl font-bold">Dashboard</h3>
-        <p className="text-sm text-gray-500">{user?.displayName || 'Guest'}</p>
+    <aside className="w-72 bg-base-200 min-h-screen p-4 shadow-sm">
+      {/* Profile */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="avatar">
+          <div className="w-14 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <img src={avatarUrl} alt="avatar" />
+          </div>
+        </div>
+        <div>
+          <h4 className="font-bold">{dbUser?.name || user?.displayName || 'Guest User'}</h4>
+          <p className="text-sm text-gray-500">{dbUser?.email || user?.email || '-'}</p>
+          <div className="badge badge-outline mt-2">{userRole}</div>
+        </div>
       </div>
 
-      <ul className="menu p-2">
-        {/* Common */}
-        <li>
-          <NavLink to="/dashboard/user">User Dashboard</NavLink>
-        </li>
+      {/* Quick stats */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="card p-3 bg-base-100 text-center">
+          <div className="text-sm text-gray-500">Bookings</div>
+          <div className="font-bold text-lg">—</div>
+        </div>
+        <div className="card p-3 bg-base-100 text-center">
+          <div className="text-sm text-gray-500">Earnings</div>
+          <div className="font-bold text-lg">—</div>
+        </div>
+      </div>
 
-        {/* Admin links */}
-        {userRole === 'admin' && (
-          <>
-            <li>
-              <NavLink to="/dashboard/admin">Admin Dashboard</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/admin/decorators">Manage Decorators</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/admin/services">Manage Services</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/admin/bookings">Manage Bookings</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/admin/analytics">Analytics</NavLink>
-            </li>
-          </>
-        )}
+      {/* Navigation */}
+      <nav>
+        <ul className="menu p-2 overflow-y-auto">
+          <li className="menu-title"><span>Quick</span></li>
+          <SidebarLink to="/dashboard/user/profile">My Profile</SidebarLink>
+          <SidebarLink to="/dashboard/user/bookings">My Bookings</SidebarLink>
+          <SidebarLink to="/dashboard/user/bookings?tab=cancellations">Booking Cancellation</SidebarLink>
+          <SidebarLink to="/dashboard/user/payment-history">Payment History</SidebarLink>
 
-        {/* Decorator links */}
-        {userRole === 'decorator' && (
-          <>
-            <li>
-              <NavLink to="/dashboard/decorator">Decorator Dashboard</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/decorator/assigned">Assigned Projects</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/decorator/schedule">Today's Schedule</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/decorator/earnings">Earnings</NavLink>
-            </li>
-          </>
-        )}
+          {userRole === 'decorator' && (
+            <>
+              <li className="menu-title mt-3"><span>Decorator</span></li>
+              <SidebarLink to="/dashboard/decorator/assigned">Assigned Projects</SidebarLink>
+              <SidebarLink to="/dashboard/decorator/schedule">Today's Schedule</SidebarLink>
+              <SidebarLink to="/dashboard/decorator/earnings">Earnings Summary</SidebarLink>
+            </>
+          )}
 
-        {/* Quick Links for user functionality */}
-        <li>
-          <NavLink to="/dashboard/user/bookings">My Bookings</NavLink>
-        </li>
-        <li>
-          <NavLink to="/dashboard/user/payment-history">Payment History</NavLink>
-        </li>
-      </ul>
-    </div>
+          {userRole === 'admin' && (
+            <>
+              <li className="menu-title mt-3"><span>Admin</span></li>
+              <SidebarLink to="/dashboard/admin">Overview</SidebarLink>
+              <SidebarLink to="/dashboard/admin/decorators">Manage Decorators</SidebarLink>
+              <SidebarLink to="/dashboard/admin/services">Manage Services</SidebarLink>
+              <SidebarLink to="/dashboard/admin/bookings">Manage Bookings</SidebarLink>
+              <SidebarLink to="/dashboard/admin/analytics">Analytics</SidebarLink>
+              <SidebarLink to="/dashboard/admin/users">Manage Users</SidebarLink>
+            </>
+          )}
+        </ul>
+      </nav>
+
+      <div className="mt-6 text-center text-xs text-gray-500">StyleDecor • Admin Panel</div>
+    </aside>
   );
 };
 

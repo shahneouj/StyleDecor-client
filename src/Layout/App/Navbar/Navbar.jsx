@@ -4,10 +4,16 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { NavLink } from "react-router";
 import useAuth from "../../../Hook/useAuth.js";
+import useAxios from "../../../Hook/useAxios.js";
 
 const NavBar = () => {
   const { user, logout } = useAuth();
-  console.log(user);
+
+  // Fetch authoritative user record from server (to get role/photo/etc.)
+  const { data: userRecord, isLoading: userRecordLoading } = useAxios('get', user?.email ? `/users/${encodeURIComponent(user.email)}` : '/users/none', {}, { enabled: !!user?.email });
+  const dbUser = userRecord?.data;
+  const userRole = dbUser?.role || user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
+  const avatarUrl = dbUser?.photoURL || user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`;
 
   const navManu = (
     <>
@@ -48,21 +54,54 @@ const NavBar = () => {
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img src={user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`} alt="avatar" />
+                <img src={avatarUrl} alt="avatar" />
               </div>
             </label>
-            <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
-              {/* role detection */}
-              {(() => {
-                const userRole = user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
-                if (userRole === 'admin') return <li><NavLink to="/dashboard/admin">Admin Dashboard</NavLink></li>;
-                if (userRole === 'decorator') return <li><NavLink to="/dashboard/decorator">Decorator Dashboard</NavLink></li>;
-                return <li><NavLink to="/dashboard/user/profile">Profile</NavLink></li>;
-              })()}
+            <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-72">
+              <li className="px-2 py-1 text-xs text-gray-500">Role: {userRecordLoading ? '...' : userRole}</li>
+              {/* role-specific structured menu */}
+              {/* use server role when available */}
+              {userRole === 'admin' && (
+                <>
+                  <li className="menu-title"><span>Admin</span></li>
+                  <li><NavLink to="/dashboard/admin">Overview</NavLink></li>
+                  <li><NavLink to="/dashboard/admin/decorators">Manage Decorators</NavLink></li>
+                  <li><NavLink to="/dashboard/admin/services">Manage Services</NavLink></li>
+                  <li><NavLink to="/dashboard/admin/bookings">Manage Bookings</NavLink></li>
+                  <li><NavLink to="/dashboard/admin/analytics">Analytics</NavLink></li>
+                  <li className="menu-title mt-2"><span>Actions</span></li>
+                  <li><NavLink to="/dashboard/admin/decorators">Approve/Disable Decorators</NavLink></li>
+                  <li><NavLink to="/dashboard/admin/services">Create Service</NavLink></li>
+                </>
+              )}
 
-              <li><NavLink to="/dashboard/user/bookings">My Bookings</NavLink></li>
-              <li><NavLink to="/dashboard/user/payment-history">Payment History</NavLink></li>
-              <li><button className="text-left w-full" onClick={() => logout()}>Logout</button></li>
+              {userRole === 'decorator' && (
+                <>
+                  <li className="menu-title"><span>Decorator</span></li>
+                  <li><NavLink to="/dashboard/decorator/assigned">My Assigned Projects</NavLink></li>
+                  <li><NavLink to="/dashboard/decorator/schedule">Today's Schedule</NavLink></li>
+                  <li><NavLink to="/dashboard/decorator/earnings">Earnings Summary</NavLink></li>
+                  <li className="menu-title mt-2"><span>Actions</span></li>
+                  <li><NavLink to="/dashboard/decorator/assigned">Update Project Status</NavLink></li>
+                  <li><NavLink to="/dashboard/user/payment-history">Payment History</NavLink></li>
+                </>
+              )}
+
+              {userRole === 'user' && (
+                <>
+                  <li className="menu-title"><span>User</span></li>
+                  <li><NavLink to="/dashboard/user/profile">My Profile</NavLink></li>
+                  <li><NavLink to="/dashboard/user/bookings">My Bookings</NavLink></li>
+                  <li><NavLink to="/dashboard/user/bookings?tab=cancellations">Booking Cancellation</NavLink></li>
+                  <li><NavLink to="/dashboard/user/payment-history">Payment History</NavLink></li>
+                  <li className="menu-title mt-2"><span>Actions</span></li>
+                  <li><NavLink to="/dashboard/user/bookings">Update / Cancel Booking</NavLink></li>
+                  <li><NavLink to="/dashboard/user/bookings?tab=pay">Pay for Booked Services</NavLink></li>
+                </>
+              )}
+
+              <li className="divider"></li>
+              <li><button className=" btn btn-primary text-left w-full" onClick={() => logout()}>Logout</button></li>
             </ul>
           </div>
         </li>

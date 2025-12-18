@@ -23,6 +23,10 @@ const AdminDashboard = () => {
           <h3 className="font-semibold">Analytics</h3>
           <p className="text-sm text-gray-500">Revenue & service demand charts</p>
         </Link>
+        <Link to="users" className="card p-4 bg-white shadow">
+          <h3 className="font-semibold">Manage Users</h3>
+          <p className="text-sm text-gray-500">View and set roles for users</p>
+        </Link>
       </div>
 
       <Outlet />

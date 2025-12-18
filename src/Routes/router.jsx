@@ -19,6 +19,7 @@ import ManageDecorators from "../Pages/Dashboard/ManageDecorators.jsx";
 import ManageServices from "../Pages/Dashboard/ManageServices.jsx";
 import ManageBookings from "../Pages/Dashboard/ManageBookings.jsx";
 import Analytics from "../Pages/Dashboard/Analytics.jsx";
+import ManageUsers from "../Pages/Dashboard/ManageUsers.jsx";
 import DecoratorDashboard from "../Pages/Dashboard/DecoratorDashboard.jsx";
 import AssignedProjects from "../Pages/Dashboard/AssignedProjects.jsx";
 import TodaysSchedule from "../Pages/Dashboard/TodaysSchedule.jsx";
@@ -56,8 +57,11 @@ export const router = createBrowserRouter([
       {
         path: "/services/:id",
         element: <ServiceDetails />
-      },
-      {
+      }
+     
+    ],
+    
+  }, {
         path: "dashboard",
         element: <DashboardLayout />,
         children: [
@@ -77,7 +81,8 @@ export const router = createBrowserRouter([
               { path: "decorators", element: <ManageDecorators /> },
               { path: "services", element: <ManageServices /> },
               { path: "bookings", element: <ManageBookings /> },
-              { path: "analytics", element: <Analytics /> }
+              { path: "analytics", element: <Analytics /> },
+              { path: "users", element: <ManageUsers /> }
             ]
           },
           {
@@ -91,6 +96,4 @@ export const router = createBrowserRouter([
           }
         ]
       }
-    ],
-  },
 ]);

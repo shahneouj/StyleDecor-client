@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hook/useAuth.js'
+import useAxios from '../../Hook/useAxios.js';
 
 const RegisterPage = () => {
 
@@ -9,6 +10,7 @@ const RegisterPage = () => {
   const fileInputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const { createUser, updateUser } = useAuth();
+  const createServerUser = useAxios('post', '/users');
 
   const avatarFile = watch('avatar') && watch('avatar')[0];
 
@@ -56,6 +58,13 @@ const RegisterPage = () => {
       const createdUser = await createUser(data.email, data.password);
       if (createdUser && updateUser) {
         await updateUser({ displayName: data.name, photoURL: avatarUrl });
+      }
+
+      // persist user on server
+      try {
+        await createServerUser.mutateAsync({ name: data.name, email: data.email, role: 'user', photoURL: avatarUrl });
+      } catch (err) {
+        console.warn('Failed to persist user to server via useAxios', err);
       }
 
       // reset form
