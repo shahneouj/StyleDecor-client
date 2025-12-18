@@ -6,7 +6,7 @@ import { NavLink } from "react-router";
 import useAuth from "../../../Hook/useAuth.js";
 
 const NavBar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   console.log(user);
 
   const navManu = (
@@ -27,18 +27,41 @@ const NavBar = () => {
         {" "}
         <NavLink to="/contact">Contact</NavLink>
       </li>
+      {user && (
+        <li>
+          <NavLink to="/dashboard">Dashboard</NavLink>
+        </li>
+      )}
     </>
   );
   const authNav = (
     <>
-      <li>
-        {" "}
-        <NavLink className="btn btn-primary" to="/login">Login</NavLink>
-      </li>
-      <li>
-        {" "}
-        <NavLink className=" btn btn-primary" to="/register">Register</NavLink>
-      </li >
+      {!user ? (
+        <>
+          <li>
+            {" "}
+            <NavLink className="btn btn-primary" to="/login">Login</NavLink>
+          </li>
+          <li>
+            {" "}
+            <NavLink className=" btn btn-primary" to="/register">Register</NavLink>
+          </li>
+        </>
+      ) : (
+        <li>
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost normal-case">{user.displayName || user.email}</label>
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li>
+                <NavLink to="/dashboard">Dashboard</NavLink>
+              </li>
+              <li>
+                <button className="text-left" onClick={() => logout()}>Logout</button>
+              </li>
+            </ul>
+          </div>
+        </li>
+      )}
     </>
   );
 
