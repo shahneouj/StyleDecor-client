@@ -5,7 +5,8 @@ const UserDashboard = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">User Dashboard</h2>
-
+<div className='flex'>  
+ 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Link to="profile" className="card p-4 bg-white shadow">
           <h3 className="font-semibold">My Profile</h3>
@@ -20,8 +21,9 @@ const UserDashboard = () => {
           <p className="text-sm text-gray-500">View past transactions</p>
         </Link>
       </div>
-
+<div className="divider lg:divider-horizontal "></div>
       <Outlet />
+   </div>
     </div>
   );
 };

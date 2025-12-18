@@ -3,14 +3,41 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hook/useAuth.js'
 import useAxios from '../../Hook/useAxios.js';
+import { FaGoogle } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
 
 const RegisterPage = () => {
 
   const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm();
   const fileInputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const { createUser, updateUser } = useAuth();
+  const { createUser, updateUser, googleLogin } = useAuth();
   const createServerUser = useAxios('post', '/users');
+  const navigate = useNavigate();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const gUser = await googleLogin();
+      if (!gUser) throw new Error('Google login failed');
+
+      try {
+        await createServerUser.mutateAsync({
+          name: gUser.displayName || null,
+          email: gUser.email,
+          role: 'user',
+          photoURL: gUser.photoURL || null,
+        });
+      } catch (err) {
+        console.warn('Failed to persist Google user to server', err);
+      }
+
+      alert('Signed in with Google');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Google sign-in error', err);
+      alert(err.message || 'Google sign-in failed');
+    }
+  };
 
   const avatarFile = watch('avatar') && watch('avatar')[0];
 
@@ -166,6 +193,14 @@ const RegisterPage = () => {
           {/* Submit Button */}
           <div className="form-control mt-6">
             <button className="btn btn-secondary text-white">Register</button>
+          </div>
+
+          <div className="divider">OR</div>
+
+          <div className=" form-control">
+            <button type="button" onClick={handleGoogleSignIn} className="btn btn-outline btn-secondary flex items-center justify-center gap-2 w-full">
+              <FaGoogle /> Continue with Google
+            </button>
           </div>
 
           {/* Switch to Login */}

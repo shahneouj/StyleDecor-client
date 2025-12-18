@@ -20,35 +20,59 @@ const ManageUsers = () => {
 
   const queryClient = useQueryClient();
 
-  const changeRole = async (email, role) => {
-    if (!confirm(`Change role for ${email} to ${role}?`)) return;
-    try {
-      setUpdating(true);
-      const token = await user.getIdToken();
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL || ''}/users/${encodeURIComponent(email)}/role`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ role }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        alert('Role updated');
-        // invalidate cache for users list and the specific user so NavBar updates
-        queryClient.invalidateQueries({ predicate: (q) => {
-          const key = q.queryKey && q.queryKey[0];
-          return key === '/users' || key === `/users/${email}`;
-        }});
-        refetch();
-      } else {
-        throw new Error(json.message || 'Update failed');
+  // Per-user role action buttons which use the useAxios hook for PUT /users/:email/role
+  const RoleButtons = ({ email }) => {
+    const [localLoading, setLocalLoading] = useState(false);
+    const updateRole =  useAxios('patch', `/users/${encodeURIComponent(email)}/role`);
+  
+
+    const doChangeRole = async (role) => {
+        console.log("fatch");
+    //   if (!confirm(`Change role for ${email} to ${role}?`)) return;
+      try {
+        setLocalLoading(true);
+        console.log(`Attempting role change for ${email} -> ${role}`);
+        const json = await updateRole.mutateAsync({ role });
+        console.log('Role update response:', json);
+        if (json && json.success) {
+          alert('Role updated');
+          // invalidate cache for users list and the specific user so NavBar updates
+          queryClient.invalidateQueries({ predicate: (q) => {
+            const key = q.queryKey && q.queryKey[0];
+            return key === '/users' || key === `/users/${email}`;
+          }});
+          refetch();
+        } else {
+          const serverMsg = (json && json.message) || (json && json.error) || 'Update failed';
+          console.error('Server returned error for role update:', serverMsg, json);
+          alert(serverMsg);
+        }
+      } catch (err) {
+        // Axios or other network error
+        console.error('Role update error (exception):', err);
+        const serverBody = err?.response?.data;
+        if (serverBody && serverBody.message) {
+          alert(serverBody.message);
+        } else if (err.message) {
+          alert(err.message);
+        } else {
+          alert('Could not update role');
+        }
+      } finally {
+        setLocalLoading(false);
       }
-    } catch (err) {
-      console.error('Role update error:', err);
-      alert(err.message || 'Could not update role');
-    } finally {
-      setUpdating(false);
-    }
+    };
+
+    return (
+      <div className="btn-group">
+        <button disabled={localLoading} className="btn btn-xs" onClick={() => doChangeRole('user')}>User</button>
+        <button disabled={localLoading} className="btn btn-xs" onClick={() => doChangeRole('decorator')}>Decorator</button>
+        <button disabled={localLoading} className="btn btn-xs btn-primary" onClick={() => doChangeRole('admin')}>Make Admin</button>
+      </div>
+    );
   };
+
+
 
   return (
     <div>
@@ -73,11 +97,7 @@ const ManageUsers = () => {
                   <td>{u.name || '-'}</td>
                   <td>{u.role}</td>
                   <td>
-                    <div className="btn-group">
-                      <button disabled={updating} className="btn btn-xs" onClick={() => changeRole(u.email, 'user')}>User</button>
-                      <button disabled={updating} className="btn btn-xs" onClick={() => changeRole(u.email, 'decorator')}>Decorator</button>
-                      <button disabled={updating} className="btn btn-xs btn-primary" onClick={() => changeRole(u.email, 'admin')}>Make Admin</button>
-                    </div>
+                    <RoleButtons email={u.email} />
                   </td>
                 </tr>
               ))}

@@ -37,16 +37,20 @@ const useAxios = (method, url, config = {}, options = {}) => {
       ...options,
     });
   }
-
-  // ---------- POST / PUT / DELETE ----------
+  
   return useMutation({
     mutationFn: async (data) => {
-      const headers = await getAuthHeaders();
+      const authHeaders = await getAuthHeaders();
+      const hdrs = {
+        'Content-Type': 'application/json',
+        ...(config.headers || {}),
+        ...authHeaders,
+      };
       const res = await axiosInstance({
         method: httpMethod,
         url,
         data,
-        headers,
+        headers: hdrs,
       });
       return res.data;
     },

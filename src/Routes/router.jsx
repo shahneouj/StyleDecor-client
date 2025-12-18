@@ -24,6 +24,7 @@ import DecoratorDashboard from "../Pages/Dashboard/DecoratorDashboard.jsx";
 import AssignedProjects from "../Pages/Dashboard/AssignedProjects.jsx";
 import TodaysSchedule from "../Pages/Dashboard/TodaysSchedule.jsx";
 import EarningsSummary from "../Pages/Dashboard/EarningsSummary.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -56,7 +57,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/services/:id",
-        element: <ServiceDetails />
+        element:<ProtectedRoute><ServiceDetails /></ProtectedRoute>
       }
      
     ],
@@ -67,7 +68,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "user",
-            element: <UserDashboard />,
+            element: <ProtectedRoute><UserDashboard /></ProtectedRoute>,
             children: [
               { path: "profile", element: <UserProfile /> },
               { path: "bookings", element: <MyBookings /> },
@@ -76,7 +77,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "admin",
-            element: <AdminDashboard />,
+            element: <ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>,
             children: [
               { path: "decorators", element: <ManageDecorators /> },
               { path: "services", element: <ManageServices /> },
@@ -87,7 +88,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "decorator",
-            element: <DecoratorDashboard />,
+            element: <ProtectedRoute roles={["decorator"]}><DecoratorDashboard /></ProtectedRoute>,
             children: [
               { path: "assigned", element: <AssignedProjects /> },
               { path: "schedule", element: <TodaysSchedule /> },

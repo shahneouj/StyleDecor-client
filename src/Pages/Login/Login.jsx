@@ -3,17 +3,43 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hook/useAuth.js';
 import { useNavigate } from 'react-router';
+import { FaGoogle } from 'react-icons/fa';
+import useAxios from '../../Hook/useAxios.js';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
+  const createServerUser = useAxios('post', '/users');
   const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const gUser = await googleLogin();
+      if (!gUser) throw new Error('Google login failed');
+
+      try {
+        await createServerUser.mutateAsync({
+          name: gUser.displayName || null,
+          email: gUser.email,
+          role: 'user',
+          photoURL: gUser.photoURL || null,
+        });
+      } catch (err) {
+        console.warn('Failed to persist Google user to server', err);
+      }
+
+      navigate('/');
+    } catch (err) {
+      console.error('Google sign-in error', err);
+      alert(err.message || 'Google sign-in failed');
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
       await login(data.email, data.password);
       // successful login
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       console.error('Login failed', err);
       alert(err.message || 'Login failed');
@@ -63,6 +89,14 @@ const LoginPage = () => {
           {/* Submit Button */}
           <div className="form-control mt-6">
             <button className="btn btn-primary text-white">Sign In</button>
+          </div>
+
+          <div className="divider">OR</div>
+
+          <div className="form-control">
+            <button type="button" onClick={handleGoogleSignIn} className="btn btn-outline btn-secondary flex items-center justify-center gap-2 w-full">
+              <FaGoogle /> Continue with Google
+            </button>
           </div>
 
           {/* Switch to Register */}

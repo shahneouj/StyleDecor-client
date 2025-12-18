@@ -13,9 +13,9 @@ const DashboardLayout = () => {
           </div>
           <Outlet />
         </div>
-        <div className="drawer-side">
+        <div className="drawer-side flex flex-col">
           <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
-          <DashboardSidebar />
+          
         </div>
       </div>
     </div>

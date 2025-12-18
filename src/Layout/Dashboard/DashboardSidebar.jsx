@@ -17,7 +17,7 @@ const DashboardSidebar = () => {
   const { data: userRecord } = useAxios('get', user?.email ? `/users/${encodeURIComponent(user.email)}` : '/users/none', {}, { enabled: !!user?.email });
   const dbUser = userRecord?.data;
   const userRole = dbUser?.role || user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
-  const avatarUrl = dbUser?.photoURL || user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`;
+  const avatarUrl = dbUser?.photoURL || user?.photoURL;
 
   return (
     <aside className="w-72 bg-base-200 min-h-screen p-4 shadow-sm">
