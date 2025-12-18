@@ -27,11 +27,7 @@ const NavBar = () => {
         {" "}
         <NavLink to="/contact">Contact</NavLink>
       </li>
-      {user && (
-        <li>
-          <NavLink to="/dashboard">Dashboard</NavLink>
-        </li>
-      )}
+      
     </>
   );
   const authNav = (
@@ -48,16 +44,25 @@ const NavBar = () => {
           </li>
         </>
       ) : (
-        <li>
+        <li className="flex items-center">
           <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost normal-case">{user.displayName || user.email}</label>
-            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-              <li>
-                <NavLink to="/dashboard">Dashboard</NavLink>
-              </li>
-              <li>
-                <button className="text-left" onClick={() => logout()}>Logout</button>
-              </li>
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img src={user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`} alt="avatar" />
+              </div>
+            </label>
+            <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
+              {/* role detection */}
+              {(() => {
+                const userRole = user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
+                if (userRole === 'admin') return <li><NavLink to="/dashboard/admin">Admin Dashboard</NavLink></li>;
+                if (userRole === 'decorator') return <li><NavLink to="/dashboard/decorator">Decorator Dashboard</NavLink></li>;
+                return <li><NavLink to="/dashboard/user/profile">Profile</NavLink></li>;
+              })()}
+
+              <li><NavLink to="/dashboard/user/bookings">My Bookings</NavLink></li>
+              <li><NavLink to="/dashboard/user/payment-history">Payment History</NavLink></li>
+              <li><button className="text-left w-full" onClick={() => logout()}>Logout</button></li>
             </ul>
           </div>
         </li>
