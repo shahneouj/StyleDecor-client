@@ -1,13 +1,16 @@
 @import "tailwindcss";
+
 @plugin "daisyui" {
   themes:
     emerald --default,
     forest --prefersdark;
 }
+
 /*dasiui custorm*/
 @utility navbar {
   @apply mx-auto max-w-[1200px];
 }
+
 /*Global styles*/
 section,
 footer {
@@ -25,4 +28,10 @@ footer {
 
 .logo svg {
   @apply text-4xl;
+}
+
+a.active {
+
+  @apply text-primary font-bold border-b-2 border-primary pb-1;
+
 }

@@ -5,12 +5,11 @@ const PaymentHistory = () => {
   const { user } = useAuth();
 
   const {
-    data: payments,
+    data,
     isLoading,
     isError,
   } = useAxios("get", `/payments/user`);
-
-
+  const payments = data?.data || []
   if (isLoading) return <div className="p-4">Loading payments...</div>;
   if (isError)
     return (
@@ -35,7 +34,7 @@ const PaymentHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {payments.data && payments.data.map((payment) => (
+            {payments && payments.map((payment) => (
               <tr key={payment._id}>
                 <td>{payment.serviceName}</td>
                 <td>{new Date(payment.createdAt).toLocaleDateString()}</td>
