@@ -2,8 +2,9 @@ import { useForm, Controller } from "react-hook-form";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import useAxios from "../../Hook/useAxios";
+import useAuth from "../../Hook/useAuth";
 
-export default function PaymentForm({ service, availableDays, className }) {
+export default function PaymentForm({ service, availableDays = [], className = '', onSuccess, onClose }) {
   const {
     register,
     control,
@@ -13,40 +14,51 @@ export default function PaymentForm({ service, availableDays, className }) {
   } = useForm();
 
   const paymentMutation = useAxios("post", "/payments", {}, {
-    onSuccess: () => {
+    onSuccess: (res) => {
       reset();
       alert("✅ Payment Successful!");
+      if (onSuccess) onSuccess(res);
     },
   });
-
+const {user}= useAuth()
   // Function to check if day is available
   const isDayAvailable = (date) => {
     // availableDays is array of strings: e.g. ['2025-12-16', '2025-12-18']
     const dateStr = date.toISOString().slice(0, 10);
-    return availableDays.includes(dateStr);
+    return (availableDays || []).includes(dateStr);
   };
 
   const onSubmit = (data) => {
+    const bookingDateStr = data.bookingDate ? data.bookingDate.toISOString().slice(0,10) : null;
     const paymentData = {
       serviceId: service._id,
-      serviceName: service.name,
-      amount: service.price,
+      serviceName: service.service_name || service.name,
+      amount: service.cost || service.price,
       customerName: data.name,
       customerEmail: data.email,
       phone: data.phone,
       paymentMethod: data.method,
-      bookingDate: data.bookingDate, // send booking date to backend
+      bookingDate: bookingDateStr, // send booking date to backend as YYYY-MM-DD
     };
 
     paymentMutation.mutate(paymentData);
-  };
+  }; 
 
   return (
     <div className={className}>
 
       <div className="card bg-base-100 shadow-xl mt-8">
         <div className="card-body">
-          <h2 className="text-2xl font-semibold mb-4">Payment & Booking</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Payment & Booking</h2>
+            <div>
+              {onClose && (
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => onClose()} aria-label="Close">
+                  Close
+                </button>
+              )}
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
@@ -67,6 +79,7 @@ export default function PaymentForm({ service, availableDays, className }) {
                 type="email"
                 className="input input-bordered w-full"
                 {...register("email", { required: "Email is required" })}
+                defaultValue={user?.email || ''}
               />
               {errors.email && <p className="text-error text-sm">{errors.email.message}</p>}
             </div>
@@ -129,7 +142,7 @@ export default function PaymentForm({ service, availableDays, className }) {
               <label className="label">Amount</label>
               <input
                 readOnly
-                value={`৳${service.price}`}
+                value={`৳${service.cost || service.price}`}
                 className="input input-bordered w-full bg-base-200"
               />
             </div>

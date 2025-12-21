@@ -139,61 +139,121 @@ const ManageDecorators = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="card p-6 bg-base-100 shadow">
         <h3 className="text-lg font-semibold mb-4">{editingId ? 'Edit Decorator' : 'Create Decorator'}</h3>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Name</span></label>
-            <input {...register('name')} className="input input-bordered" />
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Email</span></label>
-            <input {...register('email')} className="input input-bordered" />
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Phone</span></label>
-            <input {...register('phone')} className="input input-bordered" />
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Specialties (comma separated)</span></label>
-            <input {...register('specialties')} className="input input-bordered" />
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Bio</span></label>
-            <textarea {...register('bio')} className="textarea textarea-bordered" rows={3} />
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Profile Image</span></label>
+        <form onSubmit={handleSubmit(onSubmit)} className="card bg-base-100 shadow-lg p-6 max-w-3xl">
+  <h2 className="text-xl font-semibold mb-6">
+    {editingId ? "Update Decorator" : "Create Decorator"}
+  </h2>
 
-            <input type="file" accept="image/*" {...register('profileImageFile')} className="file-input file-input-bordered" />
+  {/* Basic Info */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="form-control">
+      <label className="label font-medium">Name</label>
+      <input {...register("name")} className="input input-bordered" />
+    </div>
 
-            <div className="text-xs text-gray-500 mt-2">Or paste an image URL</div>
-            <input {...register('profileImage')} placeholder="Image URL (optional)" className="input input-bordered mt-2" />
+    <div className="form-control">
+      <label className="label font-medium">Email</label>
+      <input {...register("email")} className="input input-bordered" />
+    </div>
 
-            {previewUrl && (
-              <div className="mt-3 flex items-center gap-4">
-                <img src={previewUrl} alt="preview" className="w-24 h-24 object-cover rounded" />
-                <div>
-                  <button type="button" className="btn btn-sm mt-2" onClick={() => { setValue('profileImageFile', null); setValue('profileImage', ''); setPreviewUrl(null); }}>Remove</button>
-                </div>
-              </div>
-            )}
+    <div className="form-control">
+      <label className="label font-medium">Phone</label>
+      <input {...register("phone")} className="input input-bordered" />
+    </div>
 
-          </div>
-          <div className="form-control mb-2">
-            <label className="label"><span className="label-text">Rating</span></label>
-            <input {...register('rating')} type="number" step="0.1" className="input input-bordered" />
-          </div>
-          <div className="form-control mb-4">
-            <label className="cursor-pointer label">
-              <span className="label-text">Active</span>
-              <input {...register('active')} type="checkbox" className="toggle ml-2" />
-            </label>
-          </div>
+    <div className="form-control">
+      <label className="label font-medium">Rating</label>
+      <input
+        {...register("rating")}
+        type="number"
+        step="0.1"
+        className="input input-bordered"
+      />
+    </div>
+  </div>
 
-          <div className="flex gap-2">
-            <button className="btn btn-primary" disabled={saving}>{editingId ? 'Update' : 'Create'}</button>
-            {editingId && <button type="button" onClick={cancelEdit} className="btn btn-ghost">Cancel</button>}
-          </div>
-        </form>
+  {/* Specialties */}
+  <div className="form-control mt-4">
+    <label className="label font-medium">
+      Specialties
+      <span className="label-text-alt text-gray-400">
+        comma separated
+      </span>
+    </label>
+    <input {...register("specialties")} className="input input-bordered" />
+  </div>
+
+  {/* Bio */}
+  <div className="form-control mt-4">
+    <label className="label font-medium">Bio</label>
+    <textarea
+      {...register("bio")}
+      className="textarea textarea-bordered"
+      rows={3}
+    />
+  </div>
+
+  {/* Profile Image */}
+  <div className="form-control mt-6">
+    <label className="label font-medium">Profile Image</label>
+
+    <div className="flex flex-col md:flex-row gap-4">
+      <input
+        type="file"
+        accept="image/*"
+        {...register("profileImageFile")}
+        className="file-input file-input-bordered w-full"
+      />
+
+      <input
+        {...register("profileImage")}
+        placeholder="Paste image URL (optional)"
+        className="input input-bordered w-full"
+      />
+    </div>
+
+    {previewUrl && (
+      <div className="mt-4 flex items-center gap-4 bg-base-200 p-4 rounded-lg">
+        <img
+          src={previewUrl}
+          alt="preview"
+          className="w-24 h-24 object-cover rounded-lg ring ring-primary"
+        />
+        <button
+          type="button"
+          className="btn btn-sm btn-outline"
+          onClick={() => {
+            setValue("profileImageFile", null);
+            setValue("profileImage", "");
+            setPreviewUrl(null);
+          }}
+        >
+          Remove Image
+        </button>
+      </div>
+    )}
+  </div>
+
+  {/* Active Toggle */}
+  <div className="form-control mt-6">
+    <label className="label cursor-pointer justify-start gap-4">
+      <span className="label-text font-medium">Active</span>
+      <input {...register("active")} type="checkbox" className="toggle toggle-primary" />
+    </label>
+  </div>
+
+  {/* Actions */}
+  <div className="flex justify-end gap-3 mt-8">
+    {editingId && (
+      <button type="button" onClick={cancelEdit} className="btn btn-ghost">
+        Cancel
+      </button>
+    )}
+    <button className="btn btn-primary" disabled={saving}>
+      {editingId ? "Update" : "Create"}
+    </button>
+  </div>
+</form>
       </div>
 
       <div className="lg:col-span-2">

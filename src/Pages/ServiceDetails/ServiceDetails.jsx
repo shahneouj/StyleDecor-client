@@ -1,4 +1,6 @@
 import { useParams } from "react-router";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useAxios from "../../Hook/useAxios";
 import PaymentForm from "../../component/PaymentFrom/PaymentFrom";
 
@@ -12,6 +14,8 @@ export default function ServiceDetails() {
     error,
   } = useAxios("get", `/decoration-services/${id}`, {}, { enabled: !!id });
   const service = data?.data;
+  const [open, setOpen] = useState(false);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -39,7 +43,7 @@ export default function ServiceDetails() {
 
   return (
     <div className="min-h-screen bg-base-200 py-10 px-4 ">
-      <PaymentForm service={service} availableDays={availableDays} className={'absolute'} />
+      {/* <PaymentForm service={service} availableDays={availableDays} className={'absolute'} /> */}
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="card bg-base-100 shadow-xl mb-8">
@@ -99,7 +103,7 @@ export default function ServiceDetails() {
                 <p className="text-gray-600 mb-4">
                   Ready to get started? Book this service now.
                 </p>
-                <button className="btn btn-primary w-full">
+                <button className="btn btn-primary w-full" onClick={() => setOpen(true)}>
                   Book Now
                 </button>
 
@@ -107,6 +111,32 @@ export default function ServiceDetails() {
             </div>
           </div>
         </div>
+      {/* Drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-40 z-40"
+              onClick={() => setOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            <motion.aside
+              className="fixed right-0 top-0 h-full z-50 w-full sm:w-96 p-4 overflow-auto bg-base-100 shadow-lg"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              aria-modal="true"
+              role="dialog"
+            >
+              <PaymentForm service={service} availableDays={availableDays} onSuccess={() => setOpen(false)} onClose={() => setOpen(false)} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
       </div>
     </div>
   );

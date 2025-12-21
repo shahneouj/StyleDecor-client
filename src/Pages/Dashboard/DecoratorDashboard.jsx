@@ -5,22 +5,13 @@ const DecoratorDashboard = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Decorator Dashboard</h2>
-<div className='flex'>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Link to="assigned" className="card p-4 bg-white shadow">
-          <h3 className="font-semibold">Assigned Projects</h3>
-        </Link>
-        <Link to="schedule" className="card p-4 bg-white shadow">
-          <h3 className="font-semibold">Today's Schedule</h3>
-        </Link>
-        <Link to="earnings" className="card p-4 bg-white shadow">
-          <h3 className="font-semibold">Earnings Summary</h3>
-        </Link>
+      <div className="mb-6">
+        <div className="card bg-base-100 p-6 shadow">
+          <h3 className="text-xl font-semibold mb-2">Welcome, Decorator</h3>
+          <p className="text-sm text-gray-500">Use the sidebar to view assignments, schedule and earnings.</p>
+        </div>
       </div>
-<div className="divider lg:divider-horizontal "></div>
       <Outlet />
-</div>
     </div>
   );
 };

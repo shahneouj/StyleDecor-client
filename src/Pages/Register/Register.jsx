@@ -89,7 +89,8 @@ const RegisterPage = () => {
 
       // persist user on server
       try {
-        await createServerUser.mutateAsync({ name: data.name, email: data.email, role: 'user', photoURL: avatarUrl });
+        // create server user without forcing role so existing roles are preserved
+        await createServerUser.mutateAsync({ name: data.name, email: data.email, photoURL: avatarUrl });
       } catch (err) {
         console.warn('Failed to persist user to server via useAxios', err);
       }

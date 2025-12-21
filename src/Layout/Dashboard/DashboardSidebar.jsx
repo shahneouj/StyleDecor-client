@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import useAuth from '../../Hook/useAuth.js';
 import useAxios from '../../Hook/useAxios.js';
 
@@ -13,14 +13,26 @@ const SidebarLink = ({ to, children, badge }) => (
 );
 
 const DashboardSidebar = () => {
-  const { user } = useAuth() || {};
+  const { user, logout } = useAuth() || {};
   const { data: userRecord } = useAxios('get', user?.email ? `/users/${encodeURIComponent(user.email)}` : '/users/none', {}, { enabled: !!user?.email });
   const dbUser = userRecord?.data;
   const userRole = dbUser?.role || user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
   const avatarUrl = dbUser?.photoURL || user?.photoURL;
 
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    if (!confirm('Log out?')) return;
+    try {
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed', err);
+      alert('Logout failed');
+    }
+  };
+
   return (
-    <aside className="w-72 bg-base-200 min-h-screen p-4 shadow-sm">
+    <aside className="w-72 bg-base-200 min-h-screen p-4 shadow-sm mr-6">
       {/* Profile */}
       <div className="flex items-center gap-3 mb-6">
         <div className="avatar">
@@ -61,6 +73,7 @@ const DashboardSidebar = () => {
               <li className="menu-title mt-3"><span>Decorator</span></li>
               <SidebarLink to="/dashboard/decorator/assigned">Assigned Projects</SidebarLink>
               <SidebarLink to="/dashboard/decorator/schedule">Today's Schedule</SidebarLink>
+              <SidebarLink to="/dashboard/decorator/update-status">Update Project Status</SidebarLink>
               <SidebarLink to="/dashboard/decorator/earnings">Earnings Summary</SidebarLink>
             </>
           )}
@@ -72,12 +85,18 @@ const DashboardSidebar = () => {
               <SidebarLink to="/dashboard/admin/decorators">Manage Decorators</SidebarLink>
               <SidebarLink to="/dashboard/admin/services">Manage Services</SidebarLink>
               <SidebarLink to="/dashboard/admin/bookings">Manage Bookings</SidebarLink>
+              <SidebarLink to="/dashboard/admin/assign">Assign Decorator</SidebarLink>
               <SidebarLink to="/dashboard/admin/analytics">Analytics</SidebarLink>
               <SidebarLink to="/dashboard/admin/users">Manage Users</SidebarLink>
             </>
           )}
         </ul>
       </nav>
+
+      <div className="mt-4 space-y-2">
+        <button className="btn btn-block btn-ghost w-full" onClick={() => navigate('/')}>Back to Home</button>
+        <button className="btn btn-block btn-outline btn-error w-full" onClick={handleLogout}>Logout</button>
+      </div>
 
       <div className="mt-6 text-center text-xs text-gray-500">StyleDecor • Admin Panel</div>
     </aside>

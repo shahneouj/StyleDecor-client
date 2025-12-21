@@ -18,10 +18,10 @@ const LoginPage = () => {
       if (!gUser) throw new Error('Google login failed');
 
       try {
+        // Do not override an existing role when persisting Google sign-in.
         await createServerUser.mutateAsync({
           name: gUser.displayName || null,
           email: gUser.email,
-          role: 'user',
           photoURL: gUser.photoURL || null,
         });
       } catch (err) {
