@@ -65,7 +65,6 @@ const DashboardSidebar = () => {
           <li className="menu-title"><span>Quick</span></li>
           <SidebarLink to="/dashboard/user/profile">My Profile</SidebarLink>
           <SidebarLink to="/dashboard/user/bookings">My Bookings</SidebarLink>
-          <SidebarLink to="/dashboard/user/bookings?tab=cancellations">Booking Cancellation</SidebarLink>
           <SidebarLink to="/dashboard/user/payment-history">Payment History</SidebarLink>
 
           {userRole === 'decorator' && (
@@ -74,7 +73,7 @@ const DashboardSidebar = () => {
               <SidebarLink to="/dashboard/decorator/assigned">Assigned Projects</SidebarLink>
               <SidebarLink to="/dashboard/decorator/schedule">Today's Schedule</SidebarLink>
               <SidebarLink to="/dashboard/decorator/update-status">Update Project Status</SidebarLink>
-              <SidebarLink to="/dashboard/decorator/earnings">Earnings Summary</SidebarLink>
+
             </>
           )}
 

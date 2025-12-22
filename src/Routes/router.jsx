@@ -24,7 +24,6 @@ import ManageUsers from "../Pages/Dashboard/ManageUsers.jsx";
 import DecoratorDashboard from "../Pages/Dashboard/DecoratorDashboard.jsx";
 import AssignedProjects from "../Pages/Dashboard/AssignedProjects.jsx";
 import TodaysSchedule from "../Pages/Dashboard/TodaysSchedule.jsx";
-import EarningsSummary from "../Pages/Dashboard/EarningsSummary.jsx";
 import UpdateProjectStatus from "../Pages/Dashboard/UpdateProjectStatus.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import PaymentSuccessPage from "../Pages/PaymentSuccess/PaymentSuccess.jsx";
@@ -104,7 +103,6 @@ export const router = createBrowserRouter([
           { path: "assigned", element: <AssignedProjects /> },
           { path: "schedule", element: <TodaysSchedule /> },
           { path: "update-status", element: <UpdateProjectStatus /> },
-          { path: "earnings", element: <EarningsSummary /> }
         ]
       }
     ]

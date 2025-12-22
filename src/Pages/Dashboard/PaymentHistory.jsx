@@ -1,10 +1,13 @@
 import { Navigate, useNavigate } from "react-router";
 import useAuth from "../../Hook/useAuth";
 import useAxios from "../../Hook/useAxios";
+import { useState } from "react";
 
 const PaymentHistory = () => {
   const { user } = useAuth();
+
   const navigate = useNavigate();
+
   const {
     data,
     isLoading,
@@ -32,6 +35,7 @@ const PaymentHistory = () => {
         }
       }
     });
+
   }
   return (
     <div className="max-w-5xl mx-auto p-4">
@@ -55,8 +59,7 @@ const PaymentHistory = () => {
                   <td>{new Date(payment.createdAt).toLocaleDateString()}</td>
                   <td>{payment.amount?.toFixed(2)}</td>
                   <td>{payment.status}</td>
-                  <td>{payment.transactionId || "N/A"}</td>
-                  <button onClick={() => handlePay(payment)} key={index} className="btn btn-error "> pay</button>
+                  <button onClick={() => handlePay(payment)} key={index} className="btn btn-error ">{payment.status}</button>
                 </tr>
               </>
 
