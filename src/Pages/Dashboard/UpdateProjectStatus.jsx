@@ -24,7 +24,7 @@ export default function UpdateProjectStatus() {
       try {
         setLoading(true);
         console.log(target, prog);
-        const json = await patch.mutateAsync({ status: target, progress: prog });
+        const json = await patch.mutateAsync({ progress_status: target, progress: prog });
         if (json && json.success) {
           alert('Status updated');
           // If server returned updated booking, patch the cache for immediate UI update

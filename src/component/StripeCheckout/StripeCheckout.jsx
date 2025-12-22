@@ -44,14 +44,14 @@ const CheckoutForm = ({ amount, metadata, onClose }) => {
         metadata: {
           ...metadata,
           customerEmail: metadata.customerEmail,
-          serviceId: metadata.serviceId
+          serviceId: metadata.paymentId
         }
       });
 
       if (!intentResult.success) {
         throw new Error(intentResult.message || 'Failed to create payment intent');
       }
-
+      console.log(metadata);
       // Confirm the payment
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
@@ -74,7 +74,7 @@ const CheckoutForm = ({ amount, metadata, onClose }) => {
       } else if (paymentIntent.status === 'succeeded') {
         // Update payment status in your database
         await updatePaymentStatus.mutateAsync({
-          url: `/payments/${metadata.paymentId}/status-to-paid`,
+          url: `/payments/${metadata.serviceId}/status-to-paid`,
           data: {
             stripePaymentId: paymentIntent.id,
             paymentMethod: 'stripe_card'

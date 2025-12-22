@@ -44,7 +44,7 @@ export default function PaymentForm({
             paymentData: {
               paymentId: res.paymentId,
               serviceName: service.service_name || service.name || "Unknown Service",
-              amount: Number(service.cost || service.price || 0) * 100, // Convert to cents
+              amount: Number(service.cost || service.price || service.amount) * 100, // Convert to cents
               customerName: watch('name'),
               customerEmail: watch('email'),
               phone: watch('phone'),
