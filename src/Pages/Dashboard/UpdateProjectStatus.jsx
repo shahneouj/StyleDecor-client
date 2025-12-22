@@ -23,6 +23,7 @@ export default function UpdateProjectStatus() {
       if (!confirm(`Change status to '${target}' and progress to ${prog}%?`)) return;
       try {
         setLoading(true);
+        console.log(target, prog);
         const json = await patch.mutateAsync({ status: target, progress: prog });
         if (json && json.success) {
           alert('Status updated');

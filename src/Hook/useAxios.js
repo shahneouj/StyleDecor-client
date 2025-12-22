@@ -2,34 +2,34 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import useAuth from "./useAuth";
 
-// Axios instance with base URL
+// Axios instance
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000",
-  withCredentials: true, // optional (cookies / CORS)
+  withCredentials: true,
 });
 
-const useAxios = (method, url, config = {}, options = {}) => {
+const useAxios = (method, baseUrl = "", config = {}, options = {}) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const httpMethod = method.toLowerCase();
 
   const getAuthHeaders = async () => {
     if (!user) return {};
-    const token = await user.getIdToken(); // Firebase JWT
+    const token = await user.getIdToken();
     return { Authorization: `Bearer ${token}` };
   };
 
-  // ---------- GET ----------
+  // ===================== GET =====================
   if (httpMethod === "get") {
     return useQuery({
-      queryKey: [url, config],
+      queryKey: [baseUrl, config],
       queryFn: async () => {
-        const headers = await getAuthHeaders();
-        const res = await axiosInstance.get(url, {
+        const authHeaders = await getAuthHeaders();
+        const res = await axiosInstance.get(baseUrl, {
           ...config,
           headers: {
             ...(config.headers || {}),
-            ...headers,
+            ...authHeaders,
           },
         });
         return res.data;
@@ -37,29 +37,35 @@ const useAxios = (method, url, config = {}, options = {}) => {
       ...options,
     });
   }
-  
+
+  // ================= MUTATION ====================
   return useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async ({ url, data } = {}) => {
       const authHeaders = await getAuthHeaders();
-      const hdrs = {
-        'Content-Type': 'application/json',
-        ...(config.headers || {}),
-        ...authHeaders,
-      };
+
       const res = await axiosInstance({
         method: httpMethod,
-        url,
+        url: url || baseUrl,
         data,
-        headers: hdrs,
+        headers: {
+          "Content-Type": "application/json",
+          ...(config.headers || {}),
+          ...authHeaders,
+        },
       });
+
       return res.data;
     },
+
     onSuccess: (...args) => {
       if (options.invalidateQueries) {
-        queryClient.invalidateQueries({ queryKey: options.invalidateQueries });
+        queryClient.invalidateQueries({
+          queryKey: options.invalidateQueries,
+        });
       }
       options.onSuccess?.(...args);
     },
+
     ...options,
   });
 };

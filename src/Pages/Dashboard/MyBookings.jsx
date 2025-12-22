@@ -1,25 +1,30 @@
 import { useState } from "react";
 import useAuth from "../../Hook/useAuth";
 import useAxios from "../../Hook/useAxios";
-
+import { useForm } from 'react-hook-form'
 const MyBookings = () => {
   const { user } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
+  const [selectedBooking, setSelectedBooking] = useState(null);
   // Fetch bookings of this user
   const {
-    data: bookings,
+    data,
     isLoading,
     isError,
     refetch,
-  } = useAxios("get", `/bookings?userEmail=${user?.email}`);
+  } = useAxios("get", `/payments/unpaid`);
+  const bookings = data?.data || []
 
   // Cancel booking mutation
   const cancelBooking = useAxios("delete", "", {}, {
-    onSuccess: () => {
-      alert("Booking cancelled");
-      refetch();
-    },
-    onError: () => alert("Failed to cancel booking"),
+    invalidateQueries: ["/bookings"],
+    onSuccess: () => alert("Booking cancelled"),
   });
 
   // Update booking mutation (example: update status to "rescheduled")
@@ -33,17 +38,22 @@ const MyBookings = () => {
 
   const handleCancel = (id) => {
     if (window.confirm("Are you sure you want to cancel this booking?")) {
-      cancelBooking.mutate(`/bookings/${id}`);
+      cancelBooking.mutate({
+        url: `/bookings/${id}`,
+      });
     }
   };
 
-  const handleUpdate = (id) => {
-    // Example update: just toggling status for demo
-    const newStatus = "rescheduled";
+  const onSubmitUpdate = (data) => {
     updateBooking.mutate({
       url: `/bookings/${id}`,
-      data: { status: newStatus },
+      data: {
+        date: newDate,
+        status: "rescheduled",
+      },
     });
+
+    document.getElementById("update_modal").close();
   };
 
   if (isLoading) return <div className="p-4">Loading bookings...</div>;
@@ -56,49 +66,115 @@ const MyBookings = () => {
     return <div className="p-4">No bookings found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">My Bookings</h2>
-      <div className="space-y-4">
-        {bookings.map((booking) => (
-          <div
-            key={booking._id}
-            className="card bg-base-100 shadow-md p-4 flex flex-col md:flex-row justify-between items-center"
-          >
-            <div>
-              <p>
-                <strong>Service:</strong> {booking.serviceName}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(booking.date).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Status:</strong> {booking.status || "pending"}
-              </p>
-              <p>
-                <strong>Price:</strong> ${booking.price?.toFixed(2) || "N/A"}
-              </p>
+    <>
+      <div className="max-w-4xl mx-auto p-4">
+        <h2 className="text-2xl font-semibold mb-4">My Bookings</h2>
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <div
+              key={booking._id}
+              className="card bg-base-100 shadow-md p-4 flex flex-col md:flex-row justify-between items-center"
+            >
+              <div>
+                <p>
+                  <strong>Service:</strong> {booking.serviceName}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(booking.bookingDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Status:</strong> {booking.status || "pending"}
+                </p>
+                <p>
+                  <strong>Price:</strong> {booking.amount?.toFixed(2) || "N/A"}
+                </p>
+              </div>
+              <div className="space-x-2 mt-4 md:mt-0">
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={() => {
+                    setSelectedBooking(booking);
+                    reset({
+                      bookingDate: booking.bookingDate,
+                      status: booking.status || "rescheduled",
+                    });
+                    document.getElementById("update_modal").showModal();
+                  }}
+                >
+                  Update
+                </button>
+                <button
+                  className="btn btn-error btn-sm"
+                  onClick={() => handleCancel(booking.serviceId)}
+                  disabled={cancelBooking.isPending}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-            <div className="space-x-2 mt-4 md:mt-0">
+          ))}
+        </div>
+      </div>
+      <dialog id="update_modal" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg mb-4">Update Booking</h3>
+
+          <form onSubmit={handleSubmit(onSubmitUpdate)}>
+            {/* Date */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Booking Date</span>
+              </label>
+              <input
+                type="date"
+                className="input input-bordered"
+                {...register("bookingDate", { required: "Date is required" })}
+                min={new Date().toISOString().split("T")[0]}
+              />
+              {errors.bookingDate && (
+                <p className="text-error text-sm mt-1">
+                  {errors.bookingDate.message}
+                </p>
+              )}
+            </div>
+
+            {/* Status */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Status</span>
+              </label>
+              <select
+                className="select select-bordered"
+                {...register("status")}
+              >
+                <option value="rescheduled">Rescheduled</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+
+            <div className="modal-action">
               <button
-                className="btn btn-warning btn-sm"
-                onClick={() => handleUpdate(booking._id)}
+                type="submit"
+                className="btn btn-primary"
                 disabled={updateBooking.isPending}
               >
-                Update
+                Save Changes
               </button>
+
               <button
-                className="btn btn-error btn-sm"
-                onClick={() => handleCancel(booking._id)}
-                disabled={cancelBooking.isPending}
+                type="button"
+                className="btn"
+                onClick={() => document.getElementById("update_modal").close()}
               >
                 Cancel
               </button>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
+          </form>
+        </div>
+      </dialog>
+
+    </>
   );
 };
 
