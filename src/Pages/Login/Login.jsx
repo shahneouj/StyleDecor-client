@@ -11,7 +11,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const createServerUser = useAxios('post', '/users');
   const { register, handleSubmit, formState: { errors } } = useForm();
-
+  const [showPassword, setShowPassword] = useState(false);
+  // Toggle function
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const handleGoogleSignIn = async () => {
     try {
       const gUser = await googleLogin();
@@ -74,16 +78,33 @@ const LoginPage = () => {
             <label className="label flex justify-between items-center">
               <span className="label-text">Password</span>
             </label>
-            <input
-              {...register('password', { required: 'Password is required' })}
-              type="password"
-              placeholder="password"
-              className="input input-bordered"
-            />
+            <div className='input input-bordered relative'>
+
+              <input
+                {...register('password', {
+                  required: 'Password is required', minLength: {
+                    value: 6, message: 'Password must be at least 6 characters',
+                    pattern: {
+                      // Regex: At least 8 chars, 1 letter, 1 number
+                      value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                      message: "Password must be at least 8 characters, including 1 letter and 1 number"
+                    }
+                  }
+                })}
+                type={showPassword ? "text" : 'password'}
+                placeholder="password"
+                className=""
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-primary"
+              >
+                {showPassword ? <FaEye size={20} /> : <FaEyeSlash size={20} />}
+              </button>
+            </div>
             {errors.password && <p className="text-xs text-error mt-1">{errors.password.message}</p>}
-            <label className="label">
-              <a href="#" className="label-text-alt link link-hover text-sm">Forgot password?</a>
-            </label>
+
           </div>
 
           {/* Submit Button */}

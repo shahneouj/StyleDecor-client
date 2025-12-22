@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form';
 import useAuth from '../../Hook/useAuth.js'
 import useAxios from '../../Hook/useAxios.js';
 import { FaGoogle } from 'react-icons/fa';
-import { useNavigate } from 'react-router';
-
+import { Navigate, useNavigate } from 'react-router';
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
 const RegisterPage = () => {
 
   const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm();
@@ -14,6 +14,11 @@ const RegisterPage = () => {
   const { createUser, updateUser, googleLogin } = useAuth();
   const createServerUser = useAxios('post', '/users');
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  // Toggle function
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -102,6 +107,7 @@ const RegisterPage = () => {
 
       // redirect or show success message - keep simple for now
       alert('Registration successful');
+      Navigate('/')
     } catch (err) {
       console.error('Registration error', err);
       alert(err.message || 'Registration failed');
@@ -147,9 +153,11 @@ const RegisterPage = () => {
               {...register('email', { required: 'Email is required' })}
               type="email"
               placeholder="email@example.com"
-              className="input input-bordered"
+              className="input input-bordered "
             />
+
             {errors.email && <p className="text-xs text-error mt-1">{errors.email.message}</p>}
+
           </div>
 
           {/* Password Field */}
@@ -157,12 +165,31 @@ const RegisterPage = () => {
             <label className="label">
               <span className="label-text">Password</span>
             </label>
-            <input
-              {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } })}
-              type="password"
-              placeholder="password"
-              className="input input-bordered"
-            />
+            <div className='input input-bordered relative'>
+
+              <input
+                {...register('password', {
+                  required: 'Password is required', minLength: {
+                    value: 6, message: 'Password must be at least 6 characters',
+                    pattern: {
+                      // Regex: At least 8 chars, 1 letter, 1 number
+                      value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                      message: "Password must be at least 8 characters, including 1 letter and 1 number"
+                    }
+                  }
+                })}
+                type={showPassword ? "text" : 'password'}
+                placeholder="password"
+                className=""
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-primary"
+              >
+                {showPassword ? <FaEye size={20} /> : <FaEyeSlash size={20} />}
+              </button>
+            </div>
             {errors.password && <p className="text-xs text-error mt-1">{errors.password.message}</p>}
           </div>
 
