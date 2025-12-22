@@ -27,6 +27,8 @@ import TodaysSchedule from "../Pages/Dashboard/TodaysSchedule.jsx";
 import EarningsSummary from "../Pages/Dashboard/EarningsSummary.jsx";
 import UpdateProjectStatus from "../Pages/Dashboard/UpdateProjectStatus.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import PaymentSuccessPage from "../Pages/PaymentSuccess/PaymentSuccess.jsx";
+import StripeCheckoutPage from "../component/StripeCheckout/StripeCheckout.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -59,46 +61,52 @@ export const router = createBrowserRouter([
       },
       {
         path: "/services/:id",
-        element:<ProtectedRoute><ServiceDetails /></ProtectedRoute>
+        element: <ProtectedRoute><ServiceDetails /></ProtectedRoute>
+      }, {
+        path: "/stripe-checkout",
+        element: <ProtectedRoute><StripeCheckoutPage /></ProtectedRoute>,
       }
-     
+      , {
+        path: "/payment-success",
+        element: <ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>,
+      }
     ],
-    
+
   }, {
-        path: "dashboard",
-        element: <DashboardLayout />,
+    path: "dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "user",
+        element: <ProtectedRoute><UserDashboard /></ProtectedRoute>,
         children: [
-          {
-            path: "user",
-            element: <ProtectedRoute><UserDashboard /></ProtectedRoute>,
-            children: [
-              { path: "profile", element: <UserProfile /> },
-              { path: "bookings", element: <MyBookings /> },
-              { path: "payment-history", element: <PaymentHistory /> }
-            ]
-          },
-          {
-            path: "admin",
-            element: <ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>,
-            children: [
-              { path: "decorators", element: <ManageDecorators /> },
-              { path: "services", element: <ManageServices /> },
-              { path: "bookings", element: <ManageBookings /> },
-              { path: "assign", element: <AssignDecorator /> },
-              { path: "analytics", element: <Analytics /> },
-              { path: "users", element: <ManageUsers /> }
-            ]
-          },
-          {
-            path: "decorator",
-            element: <ProtectedRoute roles={["decorator"]}><DecoratorDashboard /></ProtectedRoute>,
-            children: [
-              { path: "assigned", element: <AssignedProjects /> },
-              { path: "schedule", element: <TodaysSchedule /> },
-              { path: "update-status", element: <UpdateProjectStatus /> },
-              { path: "earnings", element: <EarningsSummary /> }
-            ]
-          }
+          { path: "profile", element: <UserProfile /> },
+          { path: "bookings", element: <MyBookings /> },
+          { path: "payment-history", element: <PaymentHistory /> }
+        ]
+      },
+      {
+        path: "admin",
+        element: <ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>,
+        children: [
+          { path: "decorators", element: <ManageDecorators /> },
+          { path: "services", element: <ManageServices /> },
+          { path: "bookings", element: <ManageBookings /> },
+          { path: "assign", element: <AssignDecorator /> },
+          { path: "analytics", element: <Analytics /> },
+          { path: "users", element: <ManageUsers /> }
+        ]
+      },
+      {
+        path: "decorator",
+        element: <ProtectedRoute roles={["decorator"]}><DecoratorDashboard /></ProtectedRoute>,
+        children: [
+          { path: "assigned", element: <AssignedProjects /> },
+          { path: "schedule", element: <TodaysSchedule /> },
+          { path: "update-status", element: <UpdateProjectStatus /> },
+          { path: "earnings", element: <EarningsSummary /> }
         ]
       }
+    ]
+  }
 ]);

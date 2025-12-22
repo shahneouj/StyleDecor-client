@@ -1,8 +1,10 @@
+// PaymentForm.jsx (Updated)
 import { useForm, Controller } from "react-hook-form";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import useAxios from "../../Hook/useAxios";
 import useAuth from "../../Hook/useAuth";
+import { useNavigate } from "react-router";
 
 export default function PaymentForm({
   service,
@@ -12,12 +14,14 @@ export default function PaymentForm({
   onClose,
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -31,9 +35,30 @@ export default function PaymentForm({
 
   const paymentMutation = useAxios("post", "/payments", {}, {
     onSuccess: (res) => {
-      reset();
-      alert("Payment & Booking Successful!");
-      if (onSuccess) onSuccess(res);
+      const paymentMethod = watch('method');
+
+      if (paymentMethod === 'card') {
+        // For card payments, redirect to Stripe checkout
+        navigate('/stripe-checkout', {
+          state: {
+            paymentData: {
+              paymentId: res.paymentId,
+              serviceName: service.service_name || service.name || "Unknown Service",
+              amount: Number(service.cost || service.price || 0) * 100, // Convert to cents
+              customerName: watch('name'),
+              customerEmail: watch('email'),
+              phone: watch('phone'),
+              serviceId: String(service._id),
+              bookingDate: watch('bookingDate')?.toISOString().slice(0, 10)
+            }
+          }
+        });
+      } else {
+        // For other payment methods (bkash, nagad, rocket)
+        reset();
+        alert("Booking Successful! Please complete the payment.");
+        if (onSuccess) onSuccess(res);
+      }
     },
     onError: (err) => {
       console.error("Payment failed:", err);
@@ -41,7 +66,7 @@ export default function PaymentForm({
     },
   });
 
-  // Helper: Check if date is in availableDays (array of "YYYY-MM-DD" strings)
+  // Helper: Check if date is in availableDays
   const isDayAvailable = (date) => {
     if (!date) return false;
     const dateStr = date.toISOString().slice(0, 10);
@@ -61,7 +86,7 @@ export default function PaymentForm({
       : null;
 
     const paymentData = {
-      serviceId: String(service._id), // Ensure it's a string
+      serviceId: String(service._id),
       serviceName: service.service_name || service.name || "Unknown Service",
       amount: Number(service.cost || service.price || 0),
       customerName: data.name.trim(),
@@ -70,13 +95,14 @@ export default function PaymentForm({
       paymentMethod: data.method,
       bookingDate: bookingDateStr,
       progress: 0,
-      status: "unpaid", // Better to set on frontend too (backend can override)
+      status: "unpaid",
     };
 
-    console.log("Sending payment data:", paymentData); // Debug!
-
+    console.log("Sending payment data:", paymentData);
     paymentMutation.mutateAsync(paymentData);
   };
+
+  const selectedMethod = watch('method');
 
   return (
     <div className={className}>
@@ -127,7 +153,7 @@ export default function PaymentForm({
                   },
                 })}
                 defaultValue={user?.email || ""}
-                readOnly={!!user?.email} // Optional: prevent edit if logged in
+                readOnly={!!user?.email}
               />
               {errors.email && <p className="text-error text-sm mt-1">{errors.email.message}</p>}
             </div>
@@ -167,9 +193,25 @@ export default function PaymentForm({
                 <option value="bkash">bKash</option>
                 <option value="nagad">Nagad</option>
                 <option value="rocket">Rocket</option>
-                <option value="card">Credit/Debit Card</option>
+                <option value="card">Credit/Debit Card (Stripe)</option>
               </select>
               {errors.method && <p className="text-error text-sm mt-1">{errors.method.message}</p>}
+
+              {/* Payment method instructions */}
+              {selectedMethod === 'card' && (
+                <div className="mt-2 p-3 bg-blue-50 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    You will be redirected to a secure Stripe checkout page to complete your payment.
+                  </p>
+                </div>
+              )}
+              {selectedMethod === 'bkash' && (
+                <div className="mt-2 p-3 bg-green-50 rounded-md">
+                  <p className="text-sm text-green-700">
+                    Please send payment to bKash number: 017XXXXXXXX
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Booking Date Picker */}
@@ -186,7 +228,7 @@ export default function PaymentForm({
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    fromDate={new Date()} // blocks past dates
+                    fromDate={new Date()}
                     disabled={(date) => {
                       if (!date) return true;
                       const dateStr = date.toISOString().slice(0, 10);
@@ -194,8 +236,6 @@ export default function PaymentForm({
                     }}
                     modifiers={{
                       available: availableDays.map((dayStr) => {
-                        // Create Date representing midnight UTC for that day
-                        // This avoids timezone shift
                         const [year, month, day] = dayStr.split('-').map(Number);
                         return new Date(Date.UTC(year, month - 1, day + 1));
                       }),
@@ -232,6 +272,8 @@ export default function PaymentForm({
             >
               {paymentMutation.isPending ? (
                 <>Processing...</>
+              ) : selectedMethod === 'card' ? (
+                <>Continue to Secure Checkout</>
               ) : (
                 <>Pay & Book Now</>
               )}
