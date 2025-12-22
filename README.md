@@ -1,16 +1,52 @@
-# React + Vite
+# StyleDecor-server# ( সহজ সরল সিম্পল ) ASSIGNMENT-011  
+**Project: Smart Home & Ceremony Decoration Booking System – Backend API**  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- 
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Technologies Used
 
-## Expanding the ESLint configuration
+| Component       | Technology                     |
+|----------------|--------------------------------|
+| **Runtime**     | Node.js                        |
+| **Framework**   | Express                        |
+| **Database**    | MongoDB (via `mongodb` driver) |
+| **Auth**        | Firebase Admin SDK             |
+| **CORS**        | `cors`                         |
+| **Config**      | `dotenv`                       |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## How to Run
+
+1. Clone the repository
+2. Install dependencies with `npm install`
+3. Set up environment variables (`.env` file):
+   - `VITE_FIREBASE_API_KEY` and other Firebase config
+   - `MONGODB_URI` for MongoDB connection
+4. Start the backend server with `node server.js`
+5. Run the frontend with `npm run dev`
+6. Open `http://localhost:5173` in your browser
+
+## Screenshots
+
+(Add screenshots here)
+
+## GitHub
+
+https://github.com/shahneouj/StyleDecor-client
+
+## Live Link
+
+https://styledecor-45ebb.firebaseapp.com/
+
+## License
+
+This project is for educational purposes.
+
+---

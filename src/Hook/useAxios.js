@@ -3,7 +3,7 @@ import axios from "axios";
 import useAuth from "./useAuth";
 
 const axiosInstance = axios.create({
-  baseURL: "https://styledecorserver.vercel.app/",
+  baseURL: "https://styledecorserver.vercel.app",
   withCredentials: true,
 });
 
