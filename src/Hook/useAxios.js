@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import useAuth from "./useAuth";
 
-// Axios instance
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000",
   withCredentials: true,
@@ -15,11 +14,16 @@ const useAxios = (method, baseUrl = "", config = {}, options = {}) => {
 
   const getAuthHeaders = async () => {
     if (!user) return {};
-    const token = await user.getIdToken();
-    return { Authorization: `Bearer ${token}` };
+    try {
+      const token = await user.getIdToken();
+      return { Authorization: `Bearer ${token}` };
+    } catch (error) {
+      console.error("Failed to get ID token:", error);
+      return {};
+    }
   };
 
-  // ===================== GET =====================
+  // ========== GET (useQuery) ==========
   if (httpMethod === "get") {
     return useQuery({
       queryKey: [baseUrl, config],
@@ -38,14 +42,26 @@ const useAxios = (method, baseUrl = "", config = {}, options = {}) => {
     });
   }
 
-  // ================= MUTATION ====================
+  // ========== MUTATIONS (post, patch, delete, etc.) ==========
   return useMutation({
-    mutationFn: async ({ url, data } = {}) => {
+    mutationFn: async (dataOrParams) => {
       const authHeaders = await getAuthHeaders();
+
+      // Handle different parameter formats:
+      let url = baseUrl;
+      let data = dataOrParams;
+
+      // If it's an object with 'url' property, treat as { url, data } format
+      if (dataOrParams && typeof dataOrParams === 'object' && 'url' in dataOrParams) {
+        url = dataOrParams.url || baseUrl;
+        data = dataOrParams.data;
+      }
+
+      console.log("Sending request:", { method: httpMethod, url, data }); // Debug log
 
       const res = await axiosInstance({
         method: httpMethod,
-        url: url || baseUrl,
+        url,
         data,
         headers: {
           "Content-Type": "application/json",
@@ -53,21 +69,28 @@ const useAxios = (method, baseUrl = "", config = {}, options = {}) => {
           ...authHeaders,
         },
       });
-
       return res.data;
     },
-
-    onSuccess: (...args) => {
+    onSuccess: (data, variables, context) => {
       if (options.invalidateQueries) {
-        queryClient.invalidateQueries({
-          queryKey: options.invalidateQueries,
-        });
+        if (Array.isArray(options.invalidateQueries)) {
+          options.invalidateQueries.forEach((key) => {
+            queryClient.invalidateQueries({ queryKey: typeof key === "string" ? [key] : key });
+          });
+        } else if (typeof options.invalidateQueries === "string") {
+          queryClient.invalidateQueries({ queryKey: [options.invalidateQueries] });
+        }
       }
-      options.onSuccess?.(...args);
+      options.onSuccess?.(data, variables, context);
     },
-
+    onError: (error, variables, context) => {
+      console.error("Mutation error:", error);
+      options.onError?.(error, variables, context);
+    },
     ...options,
   });
 };
+
+
 
 export default useAxios;
