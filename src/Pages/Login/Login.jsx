@@ -1,9 +1,9 @@
 // LoginPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../Hook/useAuth.js';
 import { useNavigate } from 'react-router';
-import { FaGoogle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import useAxios from '../../Hook/useAxios.js';
 
 const LoginPage = () => {
@@ -12,6 +12,8 @@ const LoginPage = () => {
   const createServerUser = useAxios('post', '/users');
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
+
+
   // Toggle function
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -28,6 +30,7 @@ const LoginPage = () => {
           email: gUser.email,
           photoURL: gUser.photoURL || null,
         });
+
       } catch (err) {
         console.warn('Failed to persist Google user to server', err);
       }

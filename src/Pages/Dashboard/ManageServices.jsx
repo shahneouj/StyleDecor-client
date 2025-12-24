@@ -76,7 +76,7 @@ const ManageServices = () => {
       category: s.category || '',
       description: s.description || '',
     });
-  }; 
+  };
 
   const cancelEdit = () => {
     setEditingId(null);
@@ -91,6 +91,7 @@ const ManageServices = () => {
         await del.mutateAsync();
         alert('Deleted');
         queryClient.invalidateQueries({ queryKey: ['/services'] });
+        refetch()
         onDone();
       } catch (err) {
         console.error('Delete error:', err);
