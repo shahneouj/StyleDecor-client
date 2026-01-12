@@ -2,7 +2,7 @@ import React from "react";
 import Logo from "../../../component/Logo/Logo.jsx";
 import { useState } from "react";
 import { useEffect } from "react";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import useAuth from "../../../Hook/useAuth.js";
 import useAxios from "../../../Hook/useAxios.js";
 
@@ -13,7 +13,7 @@ const NavBar = () => {
   const { data: userRecord, isLoading: userRecordLoading } = useAxios('get', user?.email ? `/users/${encodeURIComponent(user.email)}` : '/users/none', {}, { enabled: !!user?.email });
   const dbUser = userRecord?.data;
   const userRole = dbUser?.role || user?.role || (user?.email?.includes('admin') ? 'admin' : user?.email?.includes('decorator') ? 'decorator' : 'user');
-  const avatarUrl = dbUser?.photoURL || user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName||user?.email||'user')}`;
+  const avatarUrl = dbUser?.photoURL || user?.photoURL || `https://api.dicebear.com/6.x/initials/svg?seed=${encodeURIComponent(user?.displayName || user?.email || 'user')}`;
 
   const navManu = (
     <>
@@ -33,7 +33,7 @@ const NavBar = () => {
         {" "}
         <NavLink to="/contact">Contact</NavLink>
       </li>
-      
+
     </>
   );
   const authNav = (
@@ -42,11 +42,11 @@ const NavBar = () => {
         <>
           <li>
             {" "}
-            <NavLink className="btn btn-primary" to="/login">Login</NavLink>
+            <Link className="btn btn-primary hidden md:flex" to="/login">Login</Link>
           </li>
           <li>
             {" "}
-            <NavLink className=" btn btn-primary" to="/register">Register</NavLink>
+            <Link className=" btn btn-primary hidden md:flex" to="/register">Register</Link>
           </li>
         </>
       ) : (
@@ -136,6 +136,14 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               {navManu}
+              <li>
+                {" "}
+                <Link className="btn btn-primary mb-2 " to="/login">Login</Link>
+              </li>
+              <li>
+                {" "}
+                <Link className=" btn btn-primary " to="/register">Register</Link>
+              </li>
               {/* {
                 !user ? authNav : ''
               } */}

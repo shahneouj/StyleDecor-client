@@ -42,7 +42,7 @@ export default function ServiceDetails() {
 
 
   return (
-    <div className="min-h-screen bg-base-200 py-10 px-4 ">
+    <div className="h-full bg-base-200 py-10 px-4 ">
       {/* <PaymentForm service={service} availableDays={availableDays} className={'absolute'} /> */}
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -111,32 +111,32 @@ export default function ServiceDetails() {
             </div>
           </div>
         </div>
-      {/* Drawer */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-40 z-40"
-              onClick={() => setOpen(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
+        {/* Drawer */}
+        <AnimatePresence>
+          {open && (
+            <>
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-40 z-40"
+                onClick={() => setOpen(false)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
 
-            <motion.aside
-              className="fixed right-0 top-0 h-full z-50 w-full sm:w-96 p-4 overflow-auto bg-base-100 shadow-lg"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              aria-modal="true"
-              role="dialog"
-            >
-              <PaymentForm service={service} availableDays={availableDays} onSuccess={() => setOpen(false)} onClose={() => setOpen(false)} />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+              <motion.aside
+                className="fixed right-0 top-0 h-full z-50 w-full sm:w-96 p-4 overflow-auto bg-base-100 shadow-lg"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                aria-modal="true"
+                role="dialog"
+              >
+                <PaymentForm service={service} availableDays={availableDays} onSuccess={() => setOpen(false)} onClose={() => setOpen(false)} />
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

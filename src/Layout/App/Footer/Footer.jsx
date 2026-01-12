@@ -11,7 +11,7 @@ const Footer = () => {
             <h2 className="footer-title">Contact Us</h2>
             <p>Email: support@yourbusiness.com</p>
             <p>Phone: +880 1234-567890</p>
-            <p>Address: Dhaka, Bangladesh</p>
+            <p>Address: Rajshahi , Bangladesh</p>
           </div>
 
           {/* Social Media Links */}

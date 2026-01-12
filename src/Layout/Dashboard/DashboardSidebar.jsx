@@ -47,17 +47,7 @@ const DashboardSidebar = () => {
         </div>
       </div>
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="card p-3 bg-base-100 text-center">
-          <div className="text-sm text-gray-500">Bookings</div>
-          <div className="font-bold text-lg">—</div>
-        </div>
-        <div className="card p-3 bg-base-100 text-center">
-          <div className="text-sm text-gray-500">Earnings</div>
-          <div className="font-bold text-lg">—</div>
-        </div>
-      </div>
+
 
       {/* Navigation */}
       <nav>
